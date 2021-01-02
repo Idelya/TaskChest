@@ -20,7 +20,7 @@ body{
 
 .logo{
  color: var(--primary);
- font-family: 'Lobster';
+ font-family: 'Pacifico', cursive;
 }
 
 h1{
@@ -33,15 +33,22 @@ a {
 
 a:hover{
   color: var(--action);
+  text-decoration: none;
 }
+
 .header
 {
-	position: fixed;
+  position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	background: var(--background-dark);
-	height: 64px;
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 32px;
+  align-items: center;
+  font-size: 24px;
 }
 
 main {
@@ -54,4 +61,17 @@ main {
 
 input {
     color: black;
+}
+
+nav {
+  display: flex;
+}
+
+nav p {
+  font-size: 16px;
+  margin: auto;
+}
+
+nav * {
+  padding: 0px 10px;
 }

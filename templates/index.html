@@ -6,7 +6,7 @@
 <p>Otwórz swoją skrzynię zadań</p>
 {% if not user.is_authenticated %}
 <h2>Zaloguj się</h2>
-<form formaction="{% url 'login' %}" method="post">
+<form method="post">
   {% csrf_token %}
   {{ form.as_p }}
   <input type="hidden" name="next" value="{{ next }}" />
