@@ -1,0 +1,18 @@
+{% extends 'defaultLayout.html' %}
+
+{% block content %}
+
+<h1>Witaj w TaskChest!</h1>
+<p>Otwórz swoją skrzynię zadań</p>
+{% if not user.is_authenticated %}
+<h2>Zaloguj się</h2>
+<form formaction="{% url 'login' %}" method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="hidden" name="next" value="{{ next }}" />
+  <input type="submit" value="Dalej">
+</form>
+<p>Nie masz konta?</p>
+<a href="{% url 'signup' %}">Zarejestruj się</a>
+{% endif %}
+{% endblock %}
