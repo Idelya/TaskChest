@@ -1,6 +1,15 @@
-{% extends 'defaultLayout.html' %}
-
-{% block content %}
-<p>Projects</p>
-
+{% extends 'defaultLayout.html' %} {% block content %}
+<h1>Twoje projekty</h1>
+{% if user_projects_list %}
+<ul>
+  {% for proj in user_projects_list %}
+  <li>
+    <div><p>{{proj}}</p></div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Nie posiadasz jeszcze żadnych projektów.</p>
+{% endif %}
+<a href="{% url 'newproject' %}">Stwórz nowy projekt</a>
 {% endblock %}

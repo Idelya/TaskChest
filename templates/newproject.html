@@ -1,0 +1,29 @@
+{% extends 'defaultLayout.html' %} {% block content %}
+<h1>Stwórz nowy projekt</h1>
+<form method="post">
+  {% csrf_token %} {{ formset.management_form }} {% for form in formset %}
+  <label>Nawa projektu: {{projectForm.name}}</label><br />
+  <label>Zaproś do zespołu:</label><br />
+  <div id="members">
+    {{form.username}}
+    <i id="remove" class="fas fa-minus"></i>
+  </div>
+  <i id="add-form" class="fas fa-plus"></i><br />
+  <button type="submit">Create project</button>
+  {% endfor %}
+</form>
+<script type="text/javascript">
+  $(document).on('click', '#add-form', function (e) {
+    e.preventDefault();
+    $('#members').append(
+      '<div><input type="text" name="member" /><i id="remove" class="fas fa-minus"></i></div>'
+    );
+    return false;
+  });
+  $(document).on('click', '#remove', function (e) {
+    e.preventDefault();
+    $(this).parent('div').remove();
+    return false;
+  });
+</script>
+{% endblock %}

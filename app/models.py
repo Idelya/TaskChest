@@ -8,7 +8,8 @@ class User(AbstractUser):
 
 class Project(models.Model):
     name = models.CharField(max_length=30)
-    members = models.ManyToManyField(User, through='Membership')
+    def __str__(self):
+        return self.name
 
 class Membership(models.Model):
     STATUS_TYPE = (('U','UNKNOWN'), ('U','ACCEPTED'), ('R','REJECTED'))
