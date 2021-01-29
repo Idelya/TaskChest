@@ -11,4 +11,6 @@ urlpatterns = [
     path('tasks/', views.tasks, name='tasks'),
     path('signup/', views.signup, name='signup'),
     path('newproject/', views.newproject, name='newproject'),
+    path('invitation-accept/', views.invitationAccept, name='invitationAccept'),
+    path('invitation-discard/', views.invitationDiscard, name='invitationDiscard'),
 ]

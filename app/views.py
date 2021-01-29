@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-
+from django.http import HttpResponseRedirect
 from .forms import SignUpForm, MembershipFormset, NewProjectForm
 from .models import Project, Membership, User
 
@@ -95,3 +95,18 @@ def newproject(request):
         'projectForm':projectForm,
         'formset': formset,
     })
+
+@login_required
+def invitationAccept(request):
+    post = get_object_or_404(Membership, project_id=10, user=request.user)
+    post.status = 'A'
+    post.save()
+    return redirect('projects')
+
+    
+@login_required
+def invitationDiscard(request):
+    post = get_object_or_404(Membership, project_id=10, user=request.user)
+    post.status = 'R'
+    post.save()
+    return redirect('projects')

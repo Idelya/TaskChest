@@ -36,11 +36,14 @@
 {% if user_invitations_list %}
 <ul>
   {% for proj in user_invitations_list %}
-  <a>
-    <li>
-      <div><p>{{proj}}</p></div>
-    </li>
-  </a>
+  <li>
+    <span>
+      <a><p>{{proj}}</p></a>
+      <a href="{% url 'invitationAccept' %}"><i class="fas fa-check"></i></a
+      ><a href="{% url 'invitationDiscard' %}"><i class="fas fa-times"></i></a>
+    </span>
+  </li>
+
   {% endfor %}
 </ul>
 {% else %}
