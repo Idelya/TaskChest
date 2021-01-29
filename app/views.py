@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 
 from .forms import SignUpForm, MembershipFormset, NewProjectForm
 from .models import Project, Membership, User
@@ -37,8 +38,16 @@ def signup(request):
 
 @login_required
 def projects(request):
-    user_projects_list = Project.objects.all()
-    context = {'user_projects_list': user_projects_list}
+    memberships = Membership.objects.filter(user_id=request.user.id)
+    created = memberships.filter(isCreator=True).values('project_id')
+    participant = memberships.filter(isCreator=False, status='A').values('project_id')
+    invitations = memberships.filter(isCreator=False, status='U').values('project_id')
+
+    user_projects_list = Project.objects.filter(id__in=created)
+    
+    user_participant_list = Project.objects.filter(id__in=participant)
+    user_invitations_list = Project.objects.filter(id__in=invitations)
+    context = {'user_projects_list': user_projects_list, 'user_participant_list': user_participant_list, 'user_invitations_list': user_invitations_list}
     return render(request, 'projects.html', context)
 
 
@@ -56,28 +65,31 @@ def statistics(request):
 def tasks(request):
     return render(request, 'tasks.html')
 
-
+@transaction.atomic
 @login_required
 def newproject(request):
     if request.method == 'GET':
         projectForm = NewProjectForm(request.GET or None)
         formset = MembershipFormset()
     elif request.method == 'POST':
-        print('post')
         projectForm = NewProjectForm(request.POST)
         formset  = MembershipFormset(request.POST)
-        print(formset.is_valid())
+
         if formset.is_valid() and projectForm.is_valid():
             proj = projectForm.save()
             creator = Membership(status='A', user=request.user, project=proj, isCreator=True)
             creator.save()
-            for form in formset:
-                username = form.cleaned_data.get('username')
-                if username!=request.user.username:
-                    user = User.objects.get(username=username)
-                    if user is not None:
-                        member = Membership(status='U', user=user, project=proj, isCreator=False)
-                        member.save()
+
+            foms = list(set(map(lambda f: f.cleaned_data.get('username'),formset)))
+            for username in foms:
+                try:
+                    if username!=request.user.username:
+                        user = User.objects.get(username=username)
+                        if user is not None:
+                            member = Membership(status='U', user=user, project=proj, isCreator=False)
+                            member.save()
+                except:
+                    print("Not found")
         return redirect('projects')
     return render(request, 'newproject.html', {
         'projectForm':projectForm,

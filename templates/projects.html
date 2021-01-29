@@ -1,15 +1,50 @@
 {% extends 'defaultLayout.html' %} {% block content %}
-<h1>Twoje projekty</h1>
+<h1>Projekty</h1>
+<h2>Projekty stworzone przez ciebie</h2>
 {% if user_projects_list %}
 <ul>
   {% for proj in user_projects_list %}
-  <li>
-    <div><p>{{proj}}</p></div>
-  </li>
+  <a>
+    <li>
+      <div><p>{{proj}}</p></div>
+    </li>
+  </a>
   {% endfor %}
 </ul>
 {% else %}
 <p>Nie posiadasz jeszcze żadnych projektów.</p>
+{% endif %}
+
+<h2>Projekty w których uczestniczysz</h2>
+
+{% if user_participant_list %}
+<ul>
+  {% for proj in user_participant_list %}
+  <a>
+    <li>
+      <div><p>{{proj}}</p></div>
+    </li>
+  </a>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Nie uczestniczysz w żadnych innych projektach.</p>
+{% endif %}
+
+<h2>Zaproszenia</h2>
+
+{% if user_invitations_list %}
+<ul>
+  {% for proj in user_invitations_list %}
+  <a>
+    <li>
+      <div><p>{{proj}}</p></div>
+    </li>
+  </a>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Nie posiadasz aktualnie żadnych zaproszeń.</p>
 {% endif %}
 <a href="{% url 'newproject' %}">Stwórz nowy projekt</a>
 {% endblock %}

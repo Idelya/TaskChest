@@ -4,25 +4,72 @@
   {% csrf_token %} {{ formset.management_form }} {% for form in formset %}
   <label>Nawa projektu: {{projectForm.name}}</label><br />
   <label>Zaproś do zespołu:</label><br />
-  <div id="members">
-    {{form.username}}
-    <i id="remove" class="fas fa-minus"></i>
-  </div>
-  <i id="add-form" class="fas fa-plus"></i><br />
+  <ul id="members">
+    <li class="member">
+      {{form.username}} <i class="remove fas fa-minus"></i>
+    </li>
+  </ul>
+  <i id="add-form-row" class="fas fa-plus"></i><br />
   <button type="submit">Create project</button>
   {% endfor %}
 </form>
 <script type="text/javascript">
-  $(document).on('click', '#add-form', function (e) {
+  function updateElementIndex(el, prefix, ndx) {
+    var id_regex = new RegExp('(' + prefix + '-\\d+)');
+    var replacement = prefix + '-' + ndx;
+    if ($(el).attr('for'))
+      $(el).attr('for', $(el).attr('for').replace(id_regex, replacement));
+    if (el.id) el.id = el.id.replace(id_regex, replacement);
+    if (el.name) el.name = el.name.replace(id_regex, replacement);
+  }
+
+  function cloneMore(selector, prefix) {
+    const newElement = $(selector).clone(true);
+    let total = $('#id_' + prefix + '-TOTAL_FORMS').val();
+    newElement
+      .find(':input:not([type=button]):not([type=submit]):not([type=reset])')
+      .each(function () {
+        console.log(total);
+        var name = $(this)
+          .attr('name')
+          .replace('-' + (total - 1) + '-', '-' + total + '-');
+        console.log(name);
+        var id = 'id_' + name;
+        $(this).attr({ name: name, id: id }).val('');
+      });
+
+    console.log(newElement);
+    total++;
+    $('#id_' + prefix + '-TOTAL_FORMS').val(total);
+    $(selector).after(newElement);
+
+    return false;
+  }
+
+  function deleteForm(prefix, btn) {
+    var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+    if (total > 1) {
+      btn.closest('.member').remove();
+      var member = $('.member');
+      $('#id_' + prefix + '-TOTAL_FORMS').val(member.length);
+      for (var i = 0, formCount = member.length; i < formCount; i++) {
+        $(member.get(i))
+          .find(':input')
+          .each(function () {
+            updateElementIndex(this, prefix, i);
+          });
+      }
+    }
+    return false;
+  }
+  $(document).on('click', '#add-form-row', function (e) {
     e.preventDefault();
-    $('#members').append(
-      '<div><input type="text" name="member" /><i id="remove" class="fas fa-minus"></i></div>'
-    );
+    cloneMore('.member:last', 'form');
     return false;
   });
-  $(document).on('click', '#remove', function (e) {
+  $(document).on('click', '.remove', function (e) {
     e.preventDefault();
-    $(this).parent('div').remove();
+    deleteForm('form', $(this));
     return false;
   });
 </script>
