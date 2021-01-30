@@ -3,10 +3,11 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from .forms import SignUpForm, MembershipFormset, NewProjectForm
-from .models import Project, Membership, User
-
+from .models import Project, Membership, User, Table
+from django.core.exceptions import PermissionDenied
+from django.views.generic.detail import SingleObjectMixin
 
 def index(request):
     if request.method == 'POST':
@@ -110,3 +111,23 @@ def invitationDiscard(request):
     post.status = 'R'
     post.save()
     return redirect('projects')
+
+
+@login_required
+def projectManage(request, id):
+    project = get_object_or_404(Project, id=id)
+    check = Membership.objects.filter(project_id=id, user=request.user,status='A').exists()
+
+    if not check:
+        raise PermissionDenied
+
+
+    tables = Table.objects.filter(project_id=id)
+
+
+    context = {'project_name': project.name, 'project_tables': tables}
+    
+
+    project = get_object_or_404(Membership, project_id=id, user=request.user)
+    return render(request, 'manageproject.html', context)
+

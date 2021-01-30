@@ -4,7 +4,7 @@
 {% if user_projects_list %}
 <ul>
   {% for proj in user_projects_list %}
-  <a>
+  <a href="{% url 'projectManage' id=proj.id%}">
     <li>
       <div><p>{{proj}}</p></div>
     </li>
@@ -20,7 +20,7 @@
 {% if user_participant_list %}
 <ul>
   {% for proj in user_participant_list %}
-  <a>
+  <a href="{% url 'projectManage' id=proj.id%}">
     <li>
       <div><p>{{proj}}</p></div>
     </li>
@@ -38,7 +38,7 @@
   {% for proj in user_invitations_list %}
   <li>
     <span>
-      <a><p>{{proj}}</p></a>
+      <p>{{proj}}</p>
       <a href="{% url 'invitationAccept' %}"><i class="fas fa-check"></i></a
       ><a href="{% url 'invitationDiscard' %}"><i class="fas fa-times"></i></a>
     </span>

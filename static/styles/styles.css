@@ -78,3 +78,13 @@ nav * {
 button {
   background: black;
 }
+
+div.project_info {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+div.project_info * {
+  margin: 10px;
+}

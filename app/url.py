@@ -13,4 +13,5 @@ urlpatterns = [
     path('newproject/', views.newproject, name='newproject'),
     path('invitation-accept/', views.invitationAccept, name='invitationAccept'),
     path('invitation-discard/', views.invitationDiscard, name='invitationDiscard'),
+    path('project/<id>', views.projectManage, name='projectManage'),
 ]

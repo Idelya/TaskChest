@@ -1,0 +1,20 @@
+{% extends 'defaultLayout.html' %} {% block content %}
+<div class="project_info">
+  <h1>{{project_name}}</h1>
+  <a>Dodaj zadanie</a>
+  <a>Dodaj tablicę</a>
+  <p>Zespół</p>
+</div>
+{% if project_tables %}
+<section>
+  <ul>
+    {% for table in project_tables %}
+    <li>
+      <div><p>{{table}}</p></div>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+<script></script>
+{% endblock %}
