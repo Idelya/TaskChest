@@ -62,7 +62,7 @@ class Assign(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
 class LogWork(models.Model):
+    logedTime = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    time = models.PositiveIntegerField(),
     date = models.DateTimeField()

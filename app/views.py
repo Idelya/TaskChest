@@ -4,7 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse
-from .forms import SignUpForm, MembershipFormset, NewProjectForm, NewTableForm, TaskCreateForm
+from .forms import SignUpForm, MembershipFormset, NewProjectForm, NewTableForm, TaskCreateForm, LogTimeForm
 from .models import Project, Membership, User, Table, Assign
 from django.core.exceptions import PermissionDenied
 from django.views.generic.detail import SingleObjectMixin
@@ -213,5 +213,30 @@ def taskEdit(request, id):
 
     
     context = {'project': project, 'project_tables': tables, 'task_form': taskForm}
+
+    return render(request, 'manageproject.html', context)
+
+
+@login_required
+def logTime(request, id):
+    task = get_object_or_404(Task, id=id)
+    project = get_object_or_404(Project, id=task.project_id)
+    check = Membership.objects.filter(project_id=task.project_id, user=request.user,status='A').exists()
+    if not check:
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        form = LogTimeForm(request.POST)
+        if form.is_valid():
+            log = form.save(commit=False)
+            log.user_id = request.user.id
+            log.task_id = task.id
+            log.save()
+            return redirect('projectManage', task.project_id)
+        else:
+            print(form.errors)
+    tables = Table.objects.filter(project_id=task.project_id)
+    logTimeForm = LogTimeForm(request.GET or None)
+    context = {'project': project, 'project_tables': tables, 'log_time_form': logTimeForm}
 
     return render(request, 'manageproject.html', context)

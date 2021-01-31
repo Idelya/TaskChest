@@ -84,8 +84,19 @@
     </div>
     <div class="flex_in_row">
       <a href="{% url 'projectManage' id=project.id%}">Anuluj</a>
-      <a href="{% url 'projectManage' id=project.id%}">Zaloguj czas</a>
+      <a href="{% url 'logTime' id=task.id%}">Zaloguj czas</a>
     </div>
+  </form>
+</div>
+{%endif%} {% if log_time_form %}
+<div id="log_time" class="modal">
+  <form method="post">
+    {% csrf_token %}
+    <label
+      >Zaloguj czas wykonywania zadania. Czas logowany jest w minutach.</label
+    >
+    {{log_time_form.as_p}}
+    <button type="submit">Dodaj</button>
   </form>
 </div>
 {%endif%}

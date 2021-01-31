@@ -2,8 +2,12 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import AbstractUser
 from django.forms import formset_factory, ModelChoiceField
+from bootstrap_datepicker_plus import DatePickerInput
 
-from .models import User, Project, Membership, Table, Task
+from .models import User, Project, Membership, Table, Task, LogWork
+
+class DateInput(forms.DateInput):
+    input_type='date'
 
 class CustomTableField(forms.CharField):    
     def label_from_instance(self, table):
@@ -55,19 +59,11 @@ class TaskCreateForm(forms.ModelForm):
         model = Task
         fields = ('name', 'estimate', 'priority', 'describe', 'task_type', 'table', 'assigned_users')
 
-class TaskEditForm(forms.ModelForm):
-    assigned_users = forms.ModelMultipleChoiceField(
-            queryset=None,
-            widget=forms.CheckboxSelectMultiple,
-            required=False)
-    def __init__(self, *args, **kwargs):
-        self.task_id = kwargs.pop('task', None)
-        super(TaskEditForm, self).__init__(*args, **kwargs)
-        members = Membership.objects.filter(project_id=self.project_id).values('user_id')
-        self.fields['table'].queryset = Table.objects.filter(project_id=self.project_id).all()
-        self.fields['assigned_users'].queryset = User.objects.filter(pk__in = members)
 
-
+class LogTimeForm(forms.ModelForm):
     class Meta:
-        model = Task
-        fields = ('name', 'estimate', 'priority', 'describe', 'task_type', 'table', 'assigned_users')
+        model = LogWork
+        fields = ('date','logedTime')
+        widgets = {
+            'date': DateInput()
+        }

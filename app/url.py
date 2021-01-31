@@ -17,4 +17,5 @@ urlpatterns = [
     path('taskcreate/<id>', views.taskCreate, name='taskCreate'),
     path('taskview/<id>', views.taskView, name='taskView'),
     path('taskedit/<id>', views.taskEdit, name='taskEdit'),
+    path('logtime/<id>',views.logTime, name='logTime'),
 ]

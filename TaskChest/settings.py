@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrap_datepicker_plus',
+    'bootstrap3',
     'app.apps.AppConfig',
 ]
 
@@ -132,3 +134,6 @@ LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
 REDIRECT = 'index'
 
+BOOTSTRAP3 = {
+    'include_jquery': True,
+}
