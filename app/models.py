@@ -21,6 +21,8 @@ class Membership(models.Model):
 class Table(models.Model):
     name = models.CharField(max_length=30)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
 
 class Sprint(models.Model):
     num = models.PositiveIntegerField()

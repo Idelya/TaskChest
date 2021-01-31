@@ -1,20 +1,109 @@
 {% extends 'defaultLayout.html' %} {% block content %}
 <div class="project_info">
-  <h1>{{project_name}}</h1>
-  <a>Dodaj zadanie</a>
-  <a>Dodaj tablicę</a>
-  <p>Zespół</p>
+  <h1>{{project.name}}</h1>
+  <a href="{% url 'taskCreate' id=project.id%}"
+    ><button>Dodaj zadanie</button></a
+  >
+  <button id="table_add" for="table_add">Dodaj tablicę</button>
+  {% if task_form %}
+  <div id="cart_form" class="modal">
+    <form method="post">
+      {% csrf_token %}
+      <label>Nowe zadanie:</label>
+      {{task_form.as_p}}
+      <button>Dodaj</button>
+      <a href="{% url 'projectManage' id=project.id%}">Anuluj</a>
+    </form>
+  </div>
+  {%endif%}
+  <div id="get_table_name" class="unvisible">
+    <form method="post">
+      {% csrf_token %}
+      <label>Nazwa talicy:</label>
+      {{table_form.name}}
+      <button type="submit">Dodaj</button>
+    </form>
+  </div>
 </div>
 {% if project_tables %}
 <section>
-  <ul>
+  <ul class="tables_list">
     {% for table in project_tables %}
-    <li>
-      <div><p>{{table}}</p></div>
+    <li class="table">
+      <div>
+        <p>{{table.name}}</p>
+      </div>
+      <ul>
+        {% for task in table.tasks.all %}
+        <li class="task">
+          <a href="{% url 'taskView' id=task.id%}">
+            <div class="flex_in_row">
+              <p>{{task.name}}</p>
+              <p>{{task.task_type}}</p>
+            </div>
+            {% if task.assigned_users.all %}
+            <p>Przypisane osoby:</p>
+            {% endif %}
+            <div class="assigned_members">
+              {% for assigned in task.assigned_users.all %} {{assigned}},
+              {%endfor%}
+            </div>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
     </li>
     {% endfor %}
   </ul>
 </section>
-{% endif %}
-<script></script>
+{% endif %} {% if task %}
+<div id="task_view" class="modal">
+  <form class="flex_column task_view">
+    <div class="flex_in_row">
+      <p>{{task.name}}</p>
+      <a href="{% url 'taskEdit' id=task.id%}"><i class="far fa-edit"></i></a>
+    </div>
+    <div class="flex_in_row">
+      <p>Opis: {{task.describe}}</p>
+    </div>
+    <div class="flex_in_row">
+      <p>Estymacja: {{task.estimate}}</p>
+      <p>Waga: {{task.priority}}</p>
+    </div>
+    <div class="flex_in_row">
+      <p>Typ: {{task.task_type}}</p>
+      <p>Tablica: {{task.table.name}}</p>
+    </div>
+    <div class="flex_in_row">
+      {% if task.assigned_users.all %}
+      <p>Przypisane osoby:</p>
+      {% endif %}
+      <div class="assigned_members">
+        {% for assigned in task.assigned_users.all %} {{assigned}}, {%endfor%}
+      </div>
+    </div>
+    <div class="flex_in_row">
+      <a href="{% url 'projectManage' id=project.id%}">Anuluj</a>
+      <a href="{% url 'projectManage' id=project.id%}">Zaloguj czas</a>
+    </div>
+  </form>
+</div>
+{%endif%}
+<script>
+  $(document).on('click', '#table_add', function (e) {
+    const elementDOM = document.getElementById('get_table_name');
+    elementDOM.classList.toggle('modal');
+    elementDOM.classList.toggle('unvisible');
+    return false;
+  });
+
+  $(document).on('click', '#get_table_name', function (e) {
+    if (e.target !== this) return;
+
+    const elementDOM = document.getElementById('get_table_name');
+    elementDOM.classList.toggle('modal');
+    elementDOM.classList.toggle('unvisible');
+    return false;
+  });
+</script>
 {% endblock %}

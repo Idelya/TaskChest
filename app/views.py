@@ -4,10 +4,12 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse
-from .forms import SignUpForm, MembershipFormset, NewProjectForm
-from .models import Project, Membership, User, Table
+from .forms import SignUpForm, MembershipFormset, NewProjectForm, NewTableForm, TaskCreateForm
+from .models import Project, Membership, User, Table, Assign
 from django.core.exceptions import PermissionDenied
 from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import UpdateView
+from .models import Task
 
 def index(request):
     if request.method == 'POST':
@@ -116,18 +118,100 @@ def invitationDiscard(request):
 @login_required
 def projectManage(request, id):
     project = get_object_or_404(Project, id=id)
-    check = Membership.objects.filter(project_id=id, user=request.user,status='A').exists()
+    if request.method == 'POST':
+            tableFrom = NewTableForm(request.POST)
+            if tableFrom.is_valid():
+                table = tableFrom.save(commit=False)
+                table.project_id = id
+                table.save()
+                return redirect('projectManage', id)
 
+    tableForm = NewTableForm(request.GET or None)
+    check = Membership.objects.filter(project_id=id, user=request.user,status='A').exists()
     if not check:
         raise PermissionDenied
-
-
     tables = Table.objects.filter(project_id=id)
 
+    for tab in tables:
+        tab.tasks = Task.objects.filter(table_id=tab.id)
 
-    context = {'project_name': project.name, 'project_tables': tables}
-    
+    context = {'project': project, 'project_tables': tables, 'table_form': tableForm}
 
     project = get_object_or_404(Membership, project_id=id, user=request.user)
     return render(request, 'manageproject.html', context)
 
+
+@login_required
+def taskCreate(request, id):
+    project = get_object_or_404(Project, id=id)
+    if request.method == 'POST':
+        form = TaskCreateForm(request.POST, project_id=id)
+        print(form.is_valid())
+        if form.is_valid():
+            print(form)
+            task = form.save(commit=False)
+            task.project_id = id
+            task.save()
+            users = form.cleaned_data['assigned_users']
+            for user in users:
+                user = Assign(user=user,task_id=task.id)
+                user.save()
+
+            return redirect('projectManage', id)
+        else:
+            print(form.errors)
+
+
+    check = Membership.objects.filter(project_id=id, user=request.user,status='A').exists()
+    if not check:
+        raise PermissionDenied
+    tables = Table.objects.filter(project_id=id)
+    
+    taskForm = TaskCreateForm(request.GET or None, project_id=id)
+
+    
+    context = {'project': project, 'project_tables': tables, 'task_form': taskForm}
+
+    project = get_object_or_404(Membership, project_id=id, user=request.user)
+    return render(request, 'manageproject.html', context)
+
+
+@login_required
+def taskView(request, id):
+    task = get_object_or_404(Task, id=id)
+    project = get_object_or_404(Project, id=task.project_id)
+    check = Membership.objects.filter(project_id=project.id, user=request.user,status='A').exists()
+    if not check:
+        raise PermissionDenied
+    tables = Table.objects.filter(project_id=project.id)
+
+    context = {'project': project, 'project_tables': tables, 'task': task}
+
+    return render(request, 'manageproject.html', context)
+
+
+@login_required
+def taskEdit(request, id):
+    task = get_object_or_404(Task, id=id)
+    project = get_object_or_404(Project, id=task.project_id)
+    if request.method == 'POST':
+        form = TaskCreateForm(request.POST, instance=task, project_id=task.project_id)
+        if form.is_valid():
+            task = form.save()
+            
+            return redirect('projectManage', task.project_id)
+        else:
+            print(form.errors)
+
+
+    check = Membership.objects.filter(project_id=task.project_id, user=request.user,status='A').exists()
+    if not check:
+        raise PermissionDenied
+    tables = Table.objects.filter(project_id=task.project_id)
+    
+    taskForm = TaskCreateForm(request.GET or None, instance=task, project_id=task.project_id)
+
+    
+    context = {'project': project, 'project_tables': tables, 'task_form': taskForm}
+
+    return render(request, 'manageproject.html', context)
