@@ -8,6 +8,7 @@ from .models import User, Project, Membership, Table, Task, LogWork
 
 class DateInput(forms.DateInput):
     input_type='date'
+    empty_label='Data: '
 
 class CustomTableField(forms.CharField):    
     def label_from_instance(self, table):
@@ -45,6 +46,7 @@ MembershipFormset = forms.formset_factory(MemberForm,extra=1)
 class TaskCreateForm(forms.ModelForm):
     assigned_users = forms.ModelMultipleChoiceField(
             queryset=None,
+            label="Przypisani użytkownicy",
             widget=forms.CheckboxSelectMultiple,
             required=False)
     def __init__(self, *args, **kwargs):

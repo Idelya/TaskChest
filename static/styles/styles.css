@@ -210,3 +210,7 @@ li.task_elem {
 p.prim {
   font-size: 1.2em;
 }
+
+form.extra_padding {
+  padding: 30px;
+}

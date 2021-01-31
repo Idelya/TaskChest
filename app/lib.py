@@ -38,4 +38,4 @@ def getMonthStatistics(user_id):
     return {
         'data': data,
         'labels':labels
-    }
+    } 

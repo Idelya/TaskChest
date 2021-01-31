@@ -1,6 +1,7 @@
 {% extends 'defaultLayout.html' %} {% block content %}
 <h1>Statystyki</h1>
 <h2>Statystyki projektowe:</h2>
+<p>Dostepne wkrótce</p>
 <h2>Twoje statystyki:</h2>
 
 <div id="container" style="width: 75%">
@@ -23,7 +24,7 @@
         datasets: [
           {
             label: 'Projekty',
-            backgroundColor: 'blue',
+            backgroundColor: '#cfc3ff',
             data: month_data.data,
           },
         ],
@@ -35,7 +36,7 @@
         },
         title: {
           display: true,
-          text: 'Twoje miesięczne statystyki na projektach',
+          text: 'Twoje miesięczne statystyki pracy na projektach',
         },
       },
     });

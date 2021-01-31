@@ -19,7 +19,7 @@ class Membership(models.Model):
     isCreator = models.BooleanField(default=False)
 
 class Table(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(verbose_name="nazwa", max_length=30)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     def __str__(self):
         return self.name
@@ -32,15 +32,15 @@ class Sprint(models.Model):
 
 class Task(models.Model):
     TASK_TYPE = (('B','BUG'),('F','FEATURE'),('M','MAINTENANCE'), ('S','STORY'))
-    name = models.CharField(max_length=30)
-    estimate = models.PositiveIntegerField(default=0)
-    priority = models.PositiveIntegerField(default=10)
-    describe = models.TextField(null=True)
-    task_type = models.CharField(max_length=1, choices=TASK_TYPE, default='F')
+    name = models.CharField(verbose_name="nazwa", max_length=30)
+    estimate = models.PositiveIntegerField(verbose_name="estymacja", default=0)
+    priority = models.PositiveIntegerField(verbose_name="Waga", default=10)
+    describe = models.TextField(verbose_name="Opis", null=True)
+    task_type = models.CharField(verbose_name="typ",max_length=1, choices=TASK_TYPE, default='F')
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    table = models.ForeignKey(Table, on_delete=models.CASCADE, null=True)
+    table = models.ForeignKey(Table, verbose_name="Tablica", on_delete=models.CASCADE, null=True)
     sprint = models.ForeignKey(Sprint, on_delete=models.CASCADE, null=True)
-    assigned_users = models.ManyToManyField(User, through='Assign')
+    assigned_users = models.ManyToManyField(User, verbose_name="przypisani użytkownicy", through='Assign')
 
 class Notify(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -62,14 +62,7 @@ class Assign(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
 class LogWork(models.Model):
-    logedTime = models.PositiveIntegerField(default=0)
+    logedTime = models.PositiveIntegerField(default=0, verbose_name="Czas")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    date = models.DateTimeField()
-
-    def get_year(self):
-        return self.date.year
-
-    
-    def get_month(self):
-        return self.date.month
+    date = models.DateTimeField(verbose_name="Data")
