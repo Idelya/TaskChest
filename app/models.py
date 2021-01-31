@@ -66,3 +66,10 @@ class LogWork(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     date = models.DateTimeField()
+
+    def get_year(self):
+        return self.date.year
+
+    
+    def get_month(self):
+        return self.date.month

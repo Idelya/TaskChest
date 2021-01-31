@@ -10,7 +10,8 @@ from django.core.exceptions import PermissionDenied
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView
 from .models import Task
-from .lib import calcTimeForTask
+from .lib import calcTimeForTask, getMonthStatistics
+from json import dumps 
 
 def index(request):
     if request.method == 'POST':
@@ -62,7 +63,17 @@ def notifications(request):
 
 @login_required
 def statistics(request):
-    return render(request, 'statistics.html')
+    #statistics - month of user
+    labels = []
+    data = []
+    memberships = Membership.objects.filter(user_id=request.user.id, status='A').values('project_id')
+
+    user_projects_list = Project.objects.filter(id__in=memberships)
+
+    month_data = getMonthStatistics(request.user)
+
+    context = {'projects': user_projects_list, 'month_data': dumps(month_data)}
+    return render(request, 'statistics.html', context) 
 
 
 @login_required
@@ -70,7 +81,7 @@ def tasks(request):
     assigned_tasks = Assign.objects.filter(user_id=request.user.id).values('task_id')
     tasks = Task.objects.filter(pk__in = assigned_tasks)
     
-    context = {'tasks': calcTimeForTask(tasks)}
+    context = {'tasks': calcTimeForTask(tasks, request.user.id)}
     return render(request, 'tasks.html', context)
 
 @transaction.atomic
