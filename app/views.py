@@ -10,6 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView
 from .models import Task
+from .lib import calcTimeForTask
 
 def index(request):
     if request.method == 'POST':
@@ -66,7 +67,11 @@ def statistics(request):
 
 @login_required
 def tasks(request):
-    return render(request, 'tasks.html')
+    assigned_tasks = Assign.objects.filter(user_id=request.user.id).values('task_id')
+    tasks = Task.objects.filter(pk__in = assigned_tasks)
+    
+    context = {'tasks': calcTimeForTask(tasks)}
+    return render(request, 'tasks.html', context)
 
 @transaction.atomic
 @login_required
@@ -199,9 +204,7 @@ def taskEdit(request, id):
         if form.is_valid():
             task = form.save()
             
-            return redirect('projectManage', task.project_id)
-        else:
-            print(form.errors)
+        return redirect('projectManage', task.project_id)
 
 
     check = Membership.objects.filter(project_id=task.project_id, user=request.user,status='A').exists()
@@ -232,9 +235,7 @@ def logTime(request, id):
             log.user_id = request.user.id
             log.task_id = task.id
             log.save()
-            return redirect('projectManage', task.project_id)
-        else:
-            print(form.errors)
+        return redirect('projectManage', task.project_id)
     tables = Table.objects.filter(project_id=task.project_id)
     logTimeForm = LogTimeForm(request.GET or None)
     context = {'project': project, 'project_tables': tables, 'log_time_form': logTimeForm}

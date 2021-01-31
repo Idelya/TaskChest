@@ -1,6 +1,25 @@
-{% extends 'defaultLayout.html' %}
-
-{% block content %}
-<p>tasks</p>
+{% extends 'defaultLayout.html' %} {% block content %}
+<div>
+  {% if tasks %}
+  <ul class="task_list">
+    {% for task in tasks %}
+    <li class="task_elem">
+      <div class="flex_in_row">
+        <p class="prim">{{task.0.name}}</p>
+        <a href="{% url 'taskView' id=task.0.id%}"
+          >{{task.0.project}} <i class="fas fa-arrow-right"></i
+        ></a>
+      </div>
+      <div class="flex_in_row">
+        <p>Zalogowano: {{task.1}} minut.</p>
+        <p>{{task.0.table.name}}</p>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Nie posiadasz zadań.</p>
+  {% endif %}
+</div>
 
 {% endblock %}
