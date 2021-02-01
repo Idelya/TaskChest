@@ -2,6 +2,7 @@
 
 from .models import LogWork, Project, Task, Membership
 from datetime import datetime
+from functools import wraps
 
 def calcTimeForTask(tasks, user_id):
     calc = []

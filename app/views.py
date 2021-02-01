@@ -5,13 +5,15 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse
 from .forms import SignUpForm, MembershipFormset, NewProjectForm, NewTableForm, TaskCreateForm, LogTimeForm
-from .models import Project, Membership, User, Table, Assign
+from .models import Project, Membership, User, Table, Assign, Invitation, TasksNotify
 from django.core.exceptions import PermissionDenied
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView
-from .models import Task
+from .models import Task, Notify
 from .lib import calcTimeForTask, getMonthStatistics
 from json import dumps 
+from .notifications import NotyficationsContext, NotifyInvitationStrategy, NotifyTaskStrategy
+from itertools import chain
 
 def index(request):
     if request.method == 'POST':
@@ -58,7 +60,11 @@ def projects(request):
 
 @login_required
 def notifications(request):
-    return render(request, 'notifications.html')
+    notificationsTasks = TasksNotify.objects.filter(user=request.user.id)
+    notificationsInvitations = Invitation.objects.filter(user=request.user.id)
+    notifications = list(chain(notificationsTasks, notificationsInvitations))
+    context = {'notifications': notifications}
+    return render(request, 'notifications.html', context)
 
 
 @login_required
@@ -98,7 +104,7 @@ def newproject(request):
             proj = projectForm.save()
             creator = Membership(status='A', user=request.user, project=proj, isCreator=True)
             creator.save()
-
+            strategy = NotyficationsContext(NotifyInvitationStrategy())
             foms = list(set(map(lambda f: f.cleaned_data.get('username'),formset)))
             for username in foms:
                 try:
@@ -107,6 +113,7 @@ def newproject(request):
                         if user is not None:
                             member = Membership(status='U', user=user, project=proj, isCreator=False)
                             member.save()
+                            strategy.createNew(request.user, user, proj.id, "Otrzymałeś zaproszenie do uczestniczenia w projekcie: " + proj.name)
                 except:
                     print("Not found")
         return redirect('projects')
@@ -162,16 +169,16 @@ def taskCreate(request, id):
     project = get_object_or_404(Project, id=id)
     if request.method == 'POST':
         form = TaskCreateForm(request.POST, project_id=id)
-        print(form.is_valid())
         if form.is_valid():
-            print(form)
             task = form.save(commit=False)
             task.project_id = id
             task.save()
+            startegy = NotyficationsContext(NotifyTaskStrategy())
             users = form.cleaned_data['assigned_users']
             for user in users:
-                user = Assign(user=user,task_id=task.id)
-                user.save()
+                startegy.createNew(request.user, user, task.id, "Dostałeś nowe zadanie: " + task.name)
+                assign = Assign(user=user, task_id=task.id)
+                assign.save()
 
             return redirect('projectManage', id)
         else:

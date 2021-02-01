@@ -52,7 +52,7 @@ class TaskCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.project_id = kwargs.pop('project_id', None)
         super(TaskCreateForm, self).__init__(*args, **kwargs)
-        members = Membership.objects.filter(project_id=self.project_id).values('user_id')
+        members = Membership.objects.filter(project_id=self.project_id, status='A').values('user_id')
         self.fields['table'].queryset = Table.objects.filter(project_id=self.project_id).all()
         self.fields['assigned_users'].queryset = User.objects.filter(pk__in = members)
 

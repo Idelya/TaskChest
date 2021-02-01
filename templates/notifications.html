@@ -1,4 +1,20 @@
 {% extends 'defaultLayout.html' %} {% block content %}
-<p>Notyfikacje zostaną dodane wkrótce</p>
-
+<div>
+  {% if notifications %}
+  <ul class="task_list">
+    {% for not in notifications %}
+    <li class="notify_elem">
+      <div class="flex_in_row">
+        <p class="prim">{{not.describe}}</p>
+      </div>
+      <div class="flex_in_row">
+        <p class="prim">{{not.created_datetime}}</p>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Nie posiadasz zadań.</p>
+  {% endif %}
+</div>
 {% endblock %}
