@@ -39,8 +39,11 @@
   <li>
     <span>
       <p>{{proj}}</p>
-      <a href="{% url 'invitationAccept' %}"><i class="fas fa-check"></i></a
-      ><a href="{% url 'invitationDiscard' %}"><i class="fas fa-times"></i></a>
+      <a href="{% url 'invitationAccept' proj.id %}"
+        ><i class="fas fa-check"></i></a
+      ><a href="{% url 'invitationDiscard' proj.id %}"
+        ><i class="fas fa-times"></i
+      ></a>
     </span>
   </li>
 

@@ -12,7 +12,7 @@ from django.views.generic.edit import UpdateView
 from .models import Task, Notify
 from .lib import calcTimeForTask, getMonthStatistics
 from json import dumps 
-from .notifications import NotyficationsContext, NotifyInvitationStrategy, NotifyTaskStrategy
+from .notifications import NotificationsContext, NotifyInvitationStrategy, NotifyTaskStrategy
 from itertools import chain
 
 def index(request):
@@ -104,7 +104,7 @@ def newproject(request):
             proj = projectForm.save()
             creator = Membership(status='A', user=request.user, project=proj, isCreator=True)
             creator.save()
-            strategy = NotyficationsContext(NotifyInvitationStrategy())
+            strategy = NotificationsContext(NotifyInvitationStrategy())
             foms = list(set(map(lambda f: f.cleaned_data.get('username'),formset)))
             for username in foms:
                 try:
@@ -123,16 +123,16 @@ def newproject(request):
     })
 
 @login_required
-def invitationAccept(request):
-    post = get_object_or_404(Membership, project_id=10, user=request.user)
+def invitationAccept(request, id):
+    post = get_object_or_404(Membership, project_id=id, user=request.user)
     post.status = 'A'
     post.save()
     return redirect('projects')
 
     
 @login_required
-def invitationDiscard(request):
-    post = get_object_or_404(Membership, project_id=10, user=request.user)
+def invitationDiscard(request, id):
+    post = get_object_or_404(Membership, project_id=id, user=request.user)
     post.status = 'R'
     post.save()
     return redirect('projects')
@@ -173,7 +173,7 @@ def taskCreate(request, id):
             task = form.save(commit=False)
             task.project_id = id
             task.save()
-            startegy = NotyficationsContext(NotifyTaskStrategy())
+            startegy = NotificationsContext(NotifyTaskStrategy())
             users = form.cleaned_data['assigned_users']
             for user in users:
                 startegy.createNew(request.user, user, task.id, "Dostałeś nowe zadanie: " + task.name)

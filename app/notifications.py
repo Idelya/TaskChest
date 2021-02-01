@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from .models import Notify, Invitation, TasksNotify, Task, Project
 from datetime import datetime
 
-class NotyficationsContext():
+class NotificationsContext():
 
     def __init__(self, strategy: Strategy) -> None:
         self._strategy = strategy
